@@ -6,14 +6,24 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+// ==========================================
 // SUPABASE CONFIGURATION
+// ==========================================
+
 const SUPABASE_URL = "https://fojtazbjwyivuownhaun.supabase.co";
-const SUPABASE_ANON_KEY = "YOUR_EXISTING_PUBLISHABLE_KEY";
+
+const SUPABASE_ANON_KEY = "sb_publishable_iO2Cs2-UuXntlEQGENWg8Q_gCbWJelr";
 
 // INITIALIZE SUPABASE
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
 
+// ==========================================
 // GLOBAL PLATFORM OBJECT
+// ==========================================
+
 window.AgriPlatform = {
     supabase: supabase,
 
@@ -22,9 +32,14 @@ window.AgriPlatform = {
     }
 };
 
-// UTILITY
+// ==========================================
+// UTILITY FUNCTIONS
+// ==========================================
+
 function getValue(object, possibleKeys, fallback = "") {
+
     for (const key of possibleKeys) {
+
         if (
             object[key] !== undefined &&
             object[key] !== null &&
@@ -37,8 +52,9 @@ function getValue(object, possibleKeys, fallback = "") {
     return fallback;
 }
 
-// CREATE SLUG
+// CREATE URL SLUG
 function createSlug(text) {
+
     return text
         .toLowerCase()
         .trim()
@@ -47,7 +63,36 @@ function createSlug(text) {
         .replace(/^-|-$/g, "");
 }
 
+// ==========================================
+// CATEGORY ICONS
+// ==========================================
+
+const categoryIcons = {
+
+    "Agriculture Fundamentals": "🌱",
+    "Crop Science": "🌾",
+    "Soil Science": "🌍",
+    "Irrigation & Water Management": "💧",
+    "Weather & Climate": "🌦️",
+    "Seeds & Fertilizers": "🌿",
+    "Pests & Plant Diseases": "🐛",
+    "Farming Methods": "🚜",
+    "Agricultural Machinery": "⚙️",
+    "Agricultural Biotechnology": "🔬",
+    "Agricultural Economics": "📊",
+    "Agricultural Technology": "🛰️",
+    "Indian Agriculture": "🇮🇳",
+    "Government Schemes": "🏛️",
+    "Agricultural Research": "🧪",
+    "Statistics & Data": "📈",
+    "Agriculture Glossary": "📚"
+
+};
+
+// ==========================================
 // LOAD KNOWLEDGE CATEGORIES
+// ==========================================
+
 async function loadKnowledgeCategories() {
 
     const container = document.querySelector(".knowledge-grid");
@@ -57,11 +102,13 @@ async function loadKnowledgeCategories() {
         return;
     }
 
-    container.innerHTML = `
-        <p class="loading-message">
-            Loading agricultural knowledge categories...
-        </p>
-    `;
+    const loadingMessage = document.createElement("p");
+
+    loadingMessage.className = "loading-message";
+    loadingMessage.textContent =
+        "Loading agricultural knowledge categories...";
+
+    container.replaceChildren(loadingMessage);
 
     try {
 
@@ -70,40 +117,24 @@ async function loadKnowledgeCategories() {
             .select("*")
             .eq("is_active", true);
 
-        if (error) throw error;
+        if (error) {
+            throw error;
+        }
 
         console.log("Knowledge categories loaded:", data);
 
         if (!data || data.length === 0) {
 
-            container.innerHTML = `
-                <p class="empty-message">
-                    No knowledge categories are currently available.
-                </p>
-            `;
+            const message = document.createElement("p");
+
+            message.className = "empty-message";
+            message.textContent =
+                "No knowledge categories are currently available.";
+
+            container.replaceChildren(message);
 
             return;
         }
-
-        const categoryIcons = {
-            "Agriculture Fundamentals": "🌱",
-            "Crop Science": "🌾",
-            "Soil Science": "🌍",
-            "Irrigation & Water Management": "💧",
-            "Weather & Climate": "🌦️",
-            "Seeds & Fertilizers": "🌿",
-            "Pests & Plant Diseases": "🐛",
-            "Farming Methods": "🚜",
-            "Agricultural Machinery": "⚙️",
-            "Agricultural Biotechnology": "🔬",
-            "Agricultural Economics": "📊",
-            "Agricultural Technology": "🛰️",
-            "Indian Agriculture": "🇮🇳",
-            "Government Schemes": "🏛️",
-            "Agricultural Research": "🧪",
-            "Statistics & Data": "📈",
-            "Agriculture Glossary": "📚"
-        };
 
         container.replaceChildren();
 
@@ -133,27 +164,38 @@ async function loadKnowledgeCategories() {
                 categoryIcons[name] || "🌱"
             );
 
+            // CREATE CARD
             const card = document.createElement("article");
 
             card.className = "knowledge-card";
             card.setAttribute("role", "link");
             card.setAttribute("tabindex", "0");
-            card.setAttribute("aria-label", `Explore ${name}`);
+            card.setAttribute("aria-label", "Explore " + name);
 
+            // CARD NUMBER
             const number = document.createElement("span");
-            number.className = "card-number";
-            number.textContent = String(index + 1).padStart(2, "0");
 
+            number.className = "card-number";
+            number.textContent =
+                String(index + 1).padStart(2, "0");
+
+            // CATEGORY ICON
             const iconElement = document.createElement("div");
+
             iconElement.className = "card-icon";
             iconElement.textContent = icon;
 
+            // CATEGORY TITLE
             const heading = document.createElement("h3");
+
             heading.textContent = name;
 
+            // CATEGORY DESCRIPTION
             const paragraph = document.createElement("p");
+
             paragraph.textContent = description;
 
+            // ADD ELEMENTS
             card.append(
                 number,
                 iconElement,
@@ -161,19 +203,30 @@ async function loadKnowledgeCategories() {
                 paragraph
             );
 
-            // CATEGORY PAGE LINK
+            // CATEGORY PAGE DESTINATION
             const destination =
-                `./src/pages/category.html?slug=${encodeURIComponent(slug)}`;
+                "./src/pages/category.html?slug=" +
+                encodeURIComponent(slug);
 
-            card.addEventListener("click", () => {
+            // CLICK NAVIGATION
+            card.addEventListener("click", function () {
+
                 window.location.href = destination;
+
             });
 
-            card.addEventListener("keydown", (event) => {
+            // KEYBOARD NAVIGATION
+            card.addEventListener("keydown", function (event) {
 
-                if (event.key === "Enter" || event.key === " ") {
+                if (
+                    event.key === "Enter" ||
+                    event.key === " "
+                ) {
+
                     event.preventDefault();
+
                     window.location.href = destination;
+
                 }
 
             });
@@ -183,35 +236,53 @@ async function loadKnowledgeCategories() {
         });
 
         console.log(
-            `${data.length} knowledge categories displayed successfully.`
+            data.length +
+            " knowledge categories displayed successfully."
         );
 
     } catch (error) {
 
-        console.error("Unable to load knowledge categories:", error);
+        console.error(
+            "Unable to load knowledge categories:",
+            error
+        );
 
-        container.innerHTML = `
-            <p class="error-message">
-                Unable to load knowledge categories.
-                Please try again later.
-            </p>
-        `;
+        const errorMessage = document.createElement("p");
+
+        errorMessage.className = "error-message";
+        errorMessage.textContent =
+            "Unable to load knowledge categories. Please try again later.";
+
+        container.replaceChildren(errorMessage);
+
     }
+
 }
 
+// ==========================================
 // WEBSITE INITIALIZATION
-document.addEventListener("DOMContentLoaded", async () => {
+// ==========================================
+
+document.addEventListener("DOMContentLoaded", async function () {
 
     console.log("--------------------------------");
-    console.log("Agriculture Intelligence Platform initialized.");
+
+    console.log(
+        "Agriculture Intelligence Platform initialized."
+    );
+
     console.log("Supabase client initialized.");
+
     console.log("--------------------------------");
 
     await loadKnowledgeCategories();
 
 });
 
+// ==========================================
 // GLOBAL FUNCTIONS
+// ==========================================
+
 window.AgriPlatform.loadKnowledgeCategories =
     loadKnowledgeCategories;
 ```
