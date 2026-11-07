@@ -1,0 +1,323 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Agriculture Knowledge | Agri Intelligence</title>
+
+    <link rel="stylesheet" href="../styles/style.css">
+
+    <style>
+        .category-page {
+            max-width: 1100px;
+            margin: 60px auto;
+            padding: 30px 20px;
+        }
+
+        .category-header {
+            margin-bottom: 45px;
+        }
+
+        .category-icon {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+
+        .category-header h1 {
+            font-size: clamp(30px, 5vw, 48px);
+            margin-bottom: 15px;
+        }
+
+        .category-description {
+            max-width: 750px;
+            line-height: 1.8;
+        }
+
+        .article-section {
+            margin-top: 55px;
+        }
+
+        .article-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 22px;
+            margin-top: 25px;
+        }
+
+        .article-card {
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(128, 128, 128, 0.2);
+        }
+
+        .article-card h3 {
+            margin-bottom: 12px;
+        }
+
+        .article-card p {
+            line-height: 1.7;
+        }
+
+        .page-message {
+            padding: 25px;
+            line-height: 1.7;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="category-page">
+
+        <a href="../../index.html" class="back-link">
+            ← Back to Home
+        </a>
+
+        <section class="category-header">
+
+            <div class="category-icon" id="categoryIcon">🌱</div>
+
+            <h1 id="categoryName">
+                Loading Category...
+            </h1>
+
+            <p class="category-description" id="categoryDescription">
+                Loading agricultural knowledge...
+            </p>
+
+        </section>
+
+        <section class="article-section">
+
+            <h2>Explore Knowledge</h2>
+
+            <div class="article-grid" id="articleGrid">
+
+                <p class="page-message">
+                    Loading articles...
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script type="module">
+
+        import {
+            createClient
+        } from "https://esm.sh/@supabase/supabase-js@2";
+
+        // SUPABASE CONFIGURATION
+
+        const SUPABASE_URL =
+            "https://fojtazbjwyivuownhaun.supabase.co";
+
+        const SUPABASE_ANON_KEY =
+            "YOUR_EXISTING_PUBLISHABLE_KEY";
+
+        const supabase = createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY
+        );
+
+        // CATEGORY ICONS
+
+        const categoryIcons = {
+            "Agriculture Fundamentals": "🌱",
+            "Crop Science": "🌾",
+            "Soil Science": "🌍",
+            "Irrigation & Water Management": "💧",
+            "Weather & Climate": "🌦️",
+            "Seeds & Fertilizers": "🌿",
+            "Pests & Plant Diseases": "🐛",
+            "Farming Methods": "🚜",
+            "Agricultural Machinery": "⚙️",
+            "Agricultural Biotechnology": "🔬",
+            "Agricultural Economics": "📊",
+            "Agricultural Technology": "🛰️",
+            "Indian Agriculture": "🇮🇳",
+            "Government Schemes": "🏛️",
+            "Agricultural Research": "🧪",
+            "Statistics & Data": "📈",
+            "Agriculture Glossary": "📚"
+        };
+
+        // GET URL SLUG
+
+        const params = new URLSearchParams(
+            window.location.search
+        );
+
+        const slug = params.get("slug");
+
+        const categoryName =
+            document.getElementById("categoryName");
+
+        const categoryDescription =
+            document.getElementById("categoryDescription");
+
+        const categoryIcon =
+            document.getElementById("categoryIcon");
+
+        const articleGrid =
+            document.getElementById("articleGrid");
+
+        // LOAD CATEGORY
+
+        async function loadCategory() {
+
+            if (!slug) {
+
+                categoryName.textContent =
+                    "Category Not Found";
+
+                categoryDescription.textContent =
+                    "No category was specified.";
+
+                articleGrid.replaceChildren();
+
+                return;
+            }
+
+            try {
+
+                const { data: category, error } =
+                    await supabase
+                        .from("knowledge_categories")
+                        .select("*")
+                        .eq("slug", slug)
+                        .eq("is_active", true)
+                        .maybeSingle();
+
+                if (error) throw error;
+
+                if (!category) {
+
+                    categoryName.textContent =
+                        "Category Not Found";
+
+                    categoryDescription.textContent =
+                        "This category is unavailable.";
+
+                    articleGrid.replaceChildren();
+
+                    return;
+                }
+
+                const name =
+                    category.name ||
+                    category.category_name ||
+                    category.title ||
+                    "Agriculture Knowledge";
+
+                categoryName.textContent = name;
+
+                categoryDescription.textContent =
+                    category.description ||
+                    category.short_description ||
+                    "Explore scientific information and agricultural knowledge.";
+
+                categoryIcon.textContent =
+                    category.icon ||
+                    category.emoji ||
+                    categoryIcons[name] ||
+                    "🌱";
+
+                document.title =
+                    name + " | Agri Intelligence";
+
+                await loadArticles(category.id);
+
+            } catch (error) {
+
+                console.error(
+                    "Category loading error:",
+                    error
+                );
+
+                categoryName.textContent =
+                    "Unable to Load Category";
+
+                categoryDescription.textContent =
+                    "Please refresh the page and try again.";
+
+                articleGrid.textContent =
+                    "An error occurred while loading this category.";
+            }
+        }
+
+        // LOAD PUBLISHED ARTICLES
+
+        async function loadArticles(categoryId) {
+
+            articleGrid.textContent =
+                "Loading articles...";
+
+            const { data, error } = await supabase
+                .from("articles")
+                .select("*")
+                .eq("category_id", categoryId)
+                .eq("is_published", true);
+
+            if (error) throw error;
+
+            articleGrid.replaceChildren();
+
+            if (!data || data.length === 0) {
+
+                articleGrid.textContent =
+                    "No articles have been published in this category yet.";
+
+                return;
+            }
+
+            data.forEach(article => {
+
+                const card =
+                    document.createElement("article");
+
+                card.className = "article-card";
+
+                const heading =
+                    document.createElement("h3");
+
+                heading.textContent =
+                    article.title || "Untitled Article";
+
+                const description =
+                    document.createElement("p");
+
+                description.textContent =
+                    article.subtitle ||
+                    article.excerpt ||
+                    article.description ||
+                    "Explore this agricultural topic.";
+
+                card.append(heading, description);
+
+                articleGrid.appendChild(card);
+
+            });
+
+        }
+
+        // INITIALIZE PAGE
+
+        loadCategory();
+
+    </script>
+
+</body>
+
+</html>
+```
