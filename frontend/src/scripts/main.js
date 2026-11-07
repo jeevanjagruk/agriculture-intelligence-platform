@@ -1,197 +1,68 @@
-/* ==========================================
-   AGRICULTURE INTELLIGENCE PLATFORM
-   FRONTEND APPLICATION
-========================================== */
+// ==========================================
+// AGRICULTURE INTELLIGENCE PLATFORM
+// Main JavaScript File
+// ==========================================
 
-// API CONFIGURATION
+// Import Supabase JavaScript client
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const API_CONFIG = {
-    baseURL: "http://localhost:5000/api",
-    timeout: 10000
+
+// ==========================================
+// SUPABASE CONFIGURATION
+// ==========================================
+
+// Add your Supabase project credentials here later.
+
+const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
+
+// ==========================================
+// INITIALIZE SUPABASE
+// ==========================================
+
+let supabase = null;
+
+if (
+    SUPABASE_URL !== "YOUR_SUPABASE_PROJECT_URL" &&
+    SUPABASE_ANON_KEY !== "YOUR_SUPABASE_PUBLISHABLE_KEY"
+) {
+    supabase = createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+
+    console.log("Supabase connection initialized.");
+} else {
+    console.info("Supabase credentials are not configured yet.");
+}
+
+
+// ==========================================
+// GLOBAL PLATFORM OBJECT
+// ==========================================
+
+window.AgriPlatform = {
+
+    get supabase() {
+        return supabase;
+    },
+
+    isSupabaseConnected() {
+        return supabase !== null;
+    }
+
 };
 
 
-// API REQUEST HANDLER
+// ==========================================
+// WEBSITE INITIALIZATION
+// ==========================================
 
-async function apiRequest(endpoint, options = {}) {
-
-    const controller = new AbortController();
-
-    const timeout = setTimeout(
-        () => controller.abort(),
-        API_CONFIG.timeout
-    );
-
-    try {
-
-        const response = await fetch(
-            `${API_CONFIG.baseURL}${endpoint}`,
-            {
-                ...options,
-                signal: controller.signal,
-                headers: {
-                    "Content-Type": "application/json",
-                    ...options.headers
-                }
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error(
-                `API Error: ${response.status}`
-            );
-        }
-
-        return await response.json();
-
-    } catch (error) {
-
-        console.error("API Request Failed:", error);
-
-        throw error;
-
-    } finally {
-
-        clearTimeout(timeout);
-
-    }
-
-}
-
-
-// BACKEND HEALTH CHECK
-
-async function checkBackend() {
-
-    try {
-
-        const data = await apiRequest("/health");
-
-        console.log(
-            "Backend Status:",
-            data.message
-        );
-
-        return true;
-
-    } catch (error) {
-
-        console.warn(
-            "Backend is currently unavailable."
-        );
-
-        return false;
-
-    }
-
-}
-
-
-// NAVIGATION FUNCTIONALITY
-
-function initializeNavigation() {
-
-    const navigationLinks = document.querySelectorAll(
-        ".main-navigation a"
-    );
-
-    navigationLinks.forEach(link => {
-
-        link.addEventListener("click", () => {
-
-            navigationLinks.forEach(item => {
-                item.classList.remove("active");
-            });
-
-            link.classList.add("active");
-
-        });
-
-    });
-
-}
-
-
-// SCROLL FUNCTIONALITY
-
-function initializeScroll() {
-
-    const sections = document.querySelectorAll(
-        "main section[id]"
-    );
-
-    const navigationLinks = document.querySelectorAll(
-        ".main-navigation a"
-    );
-
-    if (!("IntersectionObserver" in window)) {
-        return;
-    }
-
-    const observer = new IntersectionObserver(
-        entries => {
-
-            entries.forEach(entry => {
-
-                if (entry.isIntersecting) {
-
-                    const currentId = entry.target.id;
-
-                    navigationLinks.forEach(link => {
-
-                        link.classList.toggle(
-                            "active",
-                            link.getAttribute("href") ===
-                            `#${currentId}`
-                        );
-
-                    });
-
-                }
-
-            });
-
-        },
-        {
-            rootMargin: "-20% 0px -65% 0px"
-        }
-    );
-
-    sections.forEach(section => {
-        observer.observe(section);
-    });
-
-}
-
-
-// INITIALIZE APPLICATION
-
-async function initializeApplication() {
+document.addEventListener("DOMContentLoaded", () => {
 
     console.log(
-        "Agriculture Intelligence Platform initialized."
+        "Agriculture Intelligence Platform is running."
     );
 
-    initializeNavigation();
-
-    initializeScroll();
-
-    await checkBackend();
-
-}
-
-
-// START APPLICATION
-
-document.addEventListener(
-    "DOMContentLoaded",
-    initializeApplication
-);
-
-
-// EXPORT API FUNCTIONS
-
-window.AgriAPI = {
-    request: apiRequest,
-    checkBackend: checkBackend
-};
+});
