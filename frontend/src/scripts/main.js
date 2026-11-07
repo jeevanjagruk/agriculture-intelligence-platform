@@ -1,11 +1,10 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-```javascript
+
 // ==========================================
 // AGRICULTURE INTELLIGENCE PLATFORM
 // Main JavaScript
 // ==========================================
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // ==========================================
 // SUPABASE CONFIGURATION
@@ -15,11 +14,11 @@ const SUPABASE_URL = "https://fojtazbjwyivuownhaun.supabase.co";
 
 const SUPABASE_ANON_KEY = "sb_publishable_iO2Cs2-UuXntlEQGENWg8Q_gCbWJelr";
 
-// INITIALIZE SUPABASE
 const supabase = createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
 );
+
 
 // ==========================================
 // GLOBAL PLATFORM OBJECT
@@ -32,6 +31,7 @@ window.AgriPlatform = {
         return supabase !== null;
     }
 };
+
 
 // ==========================================
 // UTILITY FUNCTIONS
@@ -53,7 +53,9 @@ function getValue(object, possibleKeys, fallback = "") {
     return fallback;
 }
 
+
 // CREATE URL SLUG
+
 function createSlug(text) {
 
     return text
@@ -63,6 +65,7 @@ function createSlug(text) {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "");
 }
+
 
 // ==========================================
 // CATEGORY ICONS
@@ -90,6 +93,7 @@ const categoryIcons = {
 
 };
 
+
 // ==========================================
 // LOAD KNOWLEDGE CATEGORIES
 // ==========================================
@@ -99,13 +103,16 @@ async function loadKnowledgeCategories() {
     const container = document.querySelector(".knowledge-grid");
 
     if (!container) {
+
         console.warn("Knowledge grid not found.");
+
         return;
     }
 
     const loadingMessage = document.createElement("p");
 
     loadingMessage.className = "loading-message";
+
     loadingMessage.textContent =
         "Loading agricultural knowledge categories...";
 
@@ -119,6 +126,7 @@ async function loadKnowledgeCategories() {
             .eq("is_active", true);
 
         if (error) {
+
             throw error;
         }
 
@@ -129,6 +137,7 @@ async function loadKnowledgeCategories() {
             const message = document.createElement("p");
 
             message.className = "empty-message";
+
             message.textContent =
                 "No knowledge categories are currently available.";
 
@@ -165,38 +174,55 @@ async function loadKnowledgeCategories() {
                 categoryIcons[name] || "🌱"
             );
 
-            // CREATE CARD
+
+            // CREATE CATEGORY CARD
+
             const card = document.createElement("article");
 
             card.className = "knowledge-card";
+
             card.setAttribute("role", "link");
+
             card.setAttribute("tabindex", "0");
+
             card.setAttribute("aria-label", "Explore " + name);
 
+
             // CARD NUMBER
+
             const number = document.createElement("span");
 
             number.className = "card-number";
+
             number.textContent =
                 String(index + 1).padStart(2, "0");
 
+
             // CATEGORY ICON
+
             const iconElement = document.createElement("div");
 
             iconElement.className = "card-icon";
+
             iconElement.textContent = icon;
 
+
             // CATEGORY TITLE
+
             const heading = document.createElement("h3");
 
             heading.textContent = name;
 
+
             // CATEGORY DESCRIPTION
+
             const paragraph = document.createElement("p");
 
             paragraph.textContent = description;
 
-            // ADD ELEMENTS
+
+            // ADD ELEMENTS TO CARD
+
             card.append(
                 number,
                 iconElement,
@@ -204,19 +230,25 @@ async function loadKnowledgeCategories() {
                 paragraph
             );
 
+
             // CATEGORY PAGE DESTINATION
+
             const destination =
                 "./src/pages/category.html?slug=" +
                 encodeURIComponent(slug);
 
+
             // CLICK NAVIGATION
+
             card.addEventListener("click", function () {
 
                 window.location.href = destination;
 
             });
 
+
             // KEYBOARD NAVIGATION
+
             card.addEventListener("keydown", function (event) {
 
                 if (
@@ -232,9 +264,13 @@ async function loadKnowledgeCategories() {
 
             });
 
+
+            // DISPLAY CARD
+
             container.appendChild(card);
 
         });
+
 
         console.log(
             data.length +
@@ -251,6 +287,7 @@ async function loadKnowledgeCategories() {
         const errorMessage = document.createElement("p");
 
         errorMessage.className = "error-message";
+
         errorMessage.textContent =
             "Unable to load knowledge categories. Please try again later.";
 
@@ -259,6 +296,7 @@ async function loadKnowledgeCategories() {
     }
 
 }
+
 
 // ==========================================
 // WEBSITE INITIALIZATION
@@ -280,10 +318,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 });
 
+
 // ==========================================
 // GLOBAL FUNCTIONS
 // ==========================================
 
 window.AgriPlatform.loadKnowledgeCategories =
     loadKnowledgeCategories;
-```
