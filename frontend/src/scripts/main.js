@@ -1,9 +1,8 @@
 // ==========================================
 // AGRICULTURE INTELLIGENCE PLATFORM
-// Main JavaScript File
+// Main JavaScript
 // ==========================================
 
-// Import Supabase JavaScript client
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 
@@ -11,31 +10,19 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // SUPABASE CONFIGURATION
 // ==========================================
 
-// Add your Supabase project credentials here later.
+const SUPABASE_URL = "https://fojtazbjwyivuownhaun.supabase.co";
 
-const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
+const SUPABASE_ANON_KEY = "sb_publishable_iO2Cs2-UuXntlEQGENWg8Q_gCbWJelr";
 
 
 // ==========================================
 // INITIALIZE SUPABASE
 // ==========================================
 
-let supabase = null;
-
-if (
-    SUPABASE_URL !== "YOUR_SUPABASE_PROJECT_URL" &&
-    SUPABASE_ANON_KEY !== "YOUR_SUPABASE_PUBLISHABLE_KEY"
-) {
-    supabase = createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-    );
-
-    console.log("Supabase connection initialized.");
-} else {
-    console.info("Supabase credentials are not configured yet.");
-}
+const supabase = createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
 
 
 // ==========================================
@@ -44,9 +31,7 @@ if (
 
 window.AgriPlatform = {
 
-    get supabase() {
-        return supabase;
-    },
+    supabase: supabase,
 
     isSupabaseConnected() {
         return supabase !== null;
@@ -61,8 +46,8 @@ window.AgriPlatform = {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    console.log(
-        "Agriculture Intelligence Platform is running."
-    );
+    console.log("Agriculture Intelligence Platform initialized.");
+
+    console.log("Supabase client initialized.");
 
 });
